@@ -22,25 +22,33 @@ namespace BotInterfaceApi
             ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
             if (activity.Type == ActivityTypes.Message)
             {
+                var token = await GetToken();
                 string entityString;
-                Rootobject StLUIS = await GetEntityFromLUIS(activity.Text);
-                if (StLUIS.intents.Count() > 0)
+                if (string.IsNullOrEmpty(token))
                 {
-                    switch (StLUIS.intents[0].intent.ToLower())
-                    {
-                        case "show":
-                            entityString = "Here is list of your tasks..."; //Call VSTS API
-                            break;
-                        default:
-                            entityString = "Sorry, I am not getting you... [please login first.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken)";
-                            break;
-                    }
+                    entityString = "[please login first.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken)";
                 }
                 else
                 {
-                    entityString = "Sorry, I am not getting you...";
+                    Rootobject StLUIS = await GetEntityFromLUIS(activity.Text);
+                    if (StLUIS.intents.Count() > 0)
+                    {
+                        switch (StLUIS.intents[0].intent.ToLower())
+                        {
+                            case "show":
+                                entityString = "Here is list of your tasks..."; //Call VSTS API
+                                break;
+                            default:
+                                entityString = "Sorry, I am not getting you...";
+                                break;
+                        }
+                    }
+
+                    else
+                    {
+                        entityString = "Sorry, I am not getting you...";
+                    }
                 }
-   
                 Activity reply = activity.CreateReply(entityString);
                 activity.TextFormat = "markdown";
                 await connector.Conversations.ReplyToActivityAsync(reply);
@@ -69,7 +77,18 @@ namespace BotInterfaceApi
             }
             return Data; 
         }
-
+        private async Task<string> GetToken()
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                string RequestURI = "https://botinterfaceapi.azurewebsites.net/vsts/getaccesstoken";                HttpResponseMessage msg = await client.GetAsync(RequestURI);
+                if (msg.IsSuccessStatusCode)
+                {
+                    return await msg.Content.ReadAsStringAsync();
+                }
+            }
+            return string.Empty;
+        }
         private Activity HandleSystemMessage(Activity message)
         {
             if (message.Type == ActivityTypes.DeleteUserData)
