@@ -4,10 +4,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Description;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
-
+using System.Web.Mvc;
 namespace BotInterfaceApi
 {
     [BotAuthentication]
@@ -75,13 +74,13 @@ namespace BotInterfaceApi
                     Data = JsonConvert.DeserializeObject<Rootobject>(JsonDataResponse);
                 }
             }
-            return Data; 
+            return Data;
         }
         private async Task<string> GetToken()
         {
             using (HttpClient client = new HttpClient())
             {
-                string RequestURI = "https://botinterfaceapi.azurewebsites.net/vsts/getaccesstoken";                HttpResponseMessage msg = await client.GetAsync(RequestURI);
+                string RequestURI = "https://botinterfaceapi.azurewebsites.net/vsts/getaccesstoken"; HttpResponseMessage msg = await client.GetAsync(RequestURI);
                 if (msg.IsSuccessStatusCode)
                 {
                     return await msg.Content.ReadAsStringAsync();
@@ -116,6 +115,14 @@ namespace BotInterfaceApi
             }
 
             return null;
+        }
+    }
+
+    public class VstsController : Controller
+    {
+        public string GetAccessToken()
+        {
+            return Session["AccessToken"] != null ? Session["AccessToken"].ToString() : string.Empty;
         }
     }
 }
