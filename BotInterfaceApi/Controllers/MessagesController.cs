@@ -32,7 +32,7 @@ namespace BotInterfaceApi
                             entityString = "Here is list of your tasks..."; //Call VSTS API
                             break;
                         default:
-                            entityString = "Sorry, I am not getting you...";
+                            entityString = "Sorry, I am not getting you... [please login first.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken)";
                             break;
                     }
                 }
@@ -42,6 +42,7 @@ namespace BotInterfaceApi
                 }
    
                 Activity reply = activity.CreateReply(entityString);
+                activity.TextFormat = "markdown";
                 await connector.Conversations.ReplyToActivityAsync(reply);
             }
             else
