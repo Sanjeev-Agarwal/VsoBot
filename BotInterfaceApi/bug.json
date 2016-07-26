@@ -1,0 +1,53 @@
+﻿{
+  "queryType": "flat",
+  "queryResultType": "workItem",
+  "asOf": "2016-07-26T06:46:29.66Z",
+  "columns": [
+    {
+      "referenceName": "System.State",
+      "name": "State",
+      "url": "https://microsoftit.visualstudio.com/DefaultCollection/_apis/wit/fields/System.State"
+    },
+    {
+      "referenceName": "System.Title",
+      "name": "Title",
+      "url": "https://microsoftit.visualstudio.com/DefaultCollection/_apis/wit/fields/System.Title"
+    }
+  ],
+  "sortColumns": [
+    {
+      "field": {
+        "referenceName": "System.State",
+        "name": "State",
+        "url": "https://microsoftit.visualstudio.com/DefaultCollection/_apis/wit/fields/System.State"
+      },
+      "descending": false
+    },
+    {
+      "field": {
+        "referenceName": "System.ChangedDate",
+        "name": "Changed Date",
+        "url": "https://microsoftit.visualstudio.com/DefaultCollection/_apis/wit/fields/System.ChangedDate"
+      },
+      "descending": true
+    }
+  ],
+  "workItems": [
+    {
+      "id": 975224,
+      "url": "https://microsoftit.visualstudio.com/DefaultCollection/_apis/wit/workItems/975224"
+    },
+    {
+      "id": 971221,
+      "url": "https://microsoftit.visualstudio.com/DefaultCollection/_apis/wit/workItems/971221"
+    },
+    {
+      "id": 961626,
+      "url": "https://microsoftit.visualstudio.com/DefaultCollection/_apis/wit/workItems/961626"
+    },
+    {
+      "id": 908471,
+      "url": "https://microsoftit.visualstudio.com/DefaultCollection/_apis/wit/workItems/908471"
+    }
+  ]
+}

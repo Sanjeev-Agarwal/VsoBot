@@ -21,21 +21,25 @@ namespace BotInterfaceApi
             ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
             if (activity.Type == ActivityTypes.Message)
             {
-                var token = await GetToken();
+                var token = IsValidUser(activity.Text);
                 string entityString;
-                if (string.IsNullOrEmpty(token))
+                if (token)
                 {
-                    entityString = "[please login first.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken)";
+                    entityString = "[This is your firt time. Please give our app permission to communicate with VSTS.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken)";
+                }
+                else if (!token && activity.Text.ToLower().Contains("hi"))
+                {
+                    entityString = "Please share your work email Id to validate your data.";// [please login first.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken)";
                 }
                 else
                 {
-                    Rootobject StLUIS = await GetEntityFromLUIS(activity.Text);
+                    LUIS.Rootobject StLUIS = await GetEntityFromLUIS(activity.Text);
                     if (StLUIS.intents.Count() > 0)
                     {
                         switch (StLUIS.intents[0].intent.ToLower())
                         {
                             case "show":
-                                entityString = "Here is list of your tasks..."; //Call VSTS API
+                                entityString = GetWorkItems(StLUIS.entities[0].type); //Call VSTS API
                                 break;
                             default:
                                 entityString = "Sorry, I am not getting you...";
@@ -60,10 +64,10 @@ namespace BotInterfaceApi
             return response;
         }
 
-        private async Task<Rootobject> GetEntityFromLUIS(string query)
+        private async Task<LUIS.Rootobject> GetEntityFromLUIS(string query)
         {
             query = Uri.EscapeDataString(query);
-            Rootobject Data = new Rootobject();
+            LUIS.Rootobject Data = new LUIS.Rootobject();
             using (HttpClient client = new HttpClient())
             {
                 string RequestURI = "https://api.projectoxford.ai/luis/v1/application?id=a72b5e9d-a2be-4e89-a788-76427e41af1a&subscription-key=a5764e3cc7a442709aa8c0e4a708502c&q=" + query;
@@ -71,22 +75,33 @@ namespace BotInterfaceApi
                 if (msg.IsSuccessStatusCode)
                 {
                     var JsonDataResponse = await msg.Content.ReadAsStringAsync();
-                    Data = JsonConvert.DeserializeObject<Rootobject>(JsonDataResponse);
+                    Data = JsonConvert.DeserializeObject<LUIS.Rootobject>(JsonDataResponse);
                 }
             }
             return Data;
         }
-        private async Task<string> GetToken()
+
+        private string GetWorkItems(string type)
         {
-            using (HttpClient client = new HttpClient())
+            var data = string.Empty;
+            if (type.Equals("task"))
             {
-                string RequestURI = "https://botinterfaceapi.azurewebsites.net/vsts/getaccesstoken"; HttpResponseMessage msg = await client.GetAsync(RequestURI);
-                if (msg.IsSuccessStatusCode)
-                {
-                    return await msg.Content.ReadAsStringAsync();
-                }
+                return new Models.TFS.Helper().Tasks;
             }
-            return string.Empty;
+            else if(type.Equals("bug"))
+            {
+                return new Models.TFS.Helper().Bugs;
+            } 
+            return "Something went wrong while looking into VSTS.";
+        } 
+        private bool IsValidUser(string query)
+        {
+            var helper = new Helpers.RegexUtilities();
+            if (helper.IsValidEmail(query))
+            {
+                return true;
+            }
+            return false;
         }
         private Activity HandleSystemMessage(Activity message)
         {
@@ -118,11 +133,13 @@ namespace BotInterfaceApi
         }
     }
 
-    public class VstsController : Controller
+    public enum WorkItemTypes
     {
-        public string GetAccessToken()
-        {
-            return Session["AccessToken"] != null ? Session["AccessToken"].ToString() : string.Empty;
-        }
+        Task,
+        Bug
+    }
+    public class VstsController : ApiController
+    {
+        
     }
 }
