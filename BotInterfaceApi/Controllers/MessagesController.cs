@@ -25,7 +25,7 @@ namespace BotInterfaceApi
                 string entityString;
                 if (token)
                 {
-                    entityString = "[This is your firt time. Please give our app permission to communicate with VSTS.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken)";
+                    entityString = "[This is your first time. Please grant permission to communicate with VSTS by clicking the link.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken?userName=" + activity.Text + ")";
                 }
                 else if (!token && activity.Text.ToLower().Contains("hi"))
                 {

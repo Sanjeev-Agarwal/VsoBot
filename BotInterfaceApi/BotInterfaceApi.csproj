@@ -193,7 +193,6 @@
     </Compile>
     <Compile Include="JSON.cs" />
     <Compile Include="Models\Regex.cs" />
-    <Compile Include="Models\TokenModel.cs" />
     <Compile Include="Models\WorkItems.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -220,6 +219,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VsoBotStorage\VsoBotStorage.csproj">
+      <Project>{03a35e79-04b4-436a-bd18-3fdd4a98dd85}</Project>
+      <Name>VsoBotStorage</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

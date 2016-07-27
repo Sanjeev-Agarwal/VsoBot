@@ -17,15 +17,12 @@ namespace BotInterfaceApi.Controllers
             return View();
         }
 
-        public ActionResult RequestToken(string code, string status)
+        public ActionResult RequestToken(string code, string status, string userName)
         {
+            Session["userName"] = userName; 
             return new RedirectResult(GenerateAuthorizeUrl());
         }
 
-        //internal string GetAccessToken(string code, string status)
-        //{
-        //    return Session["AccessToken"].ToString();
-        //}
         public ActionResult RefreshToken(string refreshToken)
         {
             TokenModel token = new TokenModel();
@@ -39,8 +36,7 @@ namespace BotInterfaceApi.Controllers
                     ViewBag.Token = token;
                 }
             }
-            Session["AccessToken"] = token.accessToken;
-            //ViewBag.Error = error;
+            ViewBag.Error = error;
             return View("TokenView");
         }
 
@@ -58,10 +54,11 @@ namespace BotInterfaceApi.Controllers
                 }
             }
 
-            Session["AccessToken"] = token.accessToken;
+            var storage = new VsoBotStorage.Token();
+            storage.SetToken(Session["userName"].ToString(), ViewBag.Token);
+
             ViewBag.Error = error;
 
-            // return Redirect("https://botinterface.azurewebsites.net/");
             return View("TokenView");
         }
 
