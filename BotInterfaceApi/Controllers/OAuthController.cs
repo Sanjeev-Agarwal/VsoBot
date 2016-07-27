@@ -19,6 +19,7 @@ namespace BotInterfaceApi.Controllers
 
         public ActionResult RequestToken(string code, string status, string userName)
         {
+            //If user already exist get token from azure blob
             Session["userName"] = userName; 
             return new RedirectResult(GenerateAuthorizeUrl());
         }
