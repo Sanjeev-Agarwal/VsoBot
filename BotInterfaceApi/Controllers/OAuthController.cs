@@ -12,15 +12,11 @@ namespace BotInterfaceApi.Controllers
     {
         //
         // GET: /OAuth/
-        public ActionResult Index()
-        {
-            return View();
-        }
-
+       
         public ActionResult RequestToken(string code, string status, string userName)
         {
             //If user already exist get token from azure blob
-            Session["userName"] = userName; 
+            Session["userName"] = HttpUtility.UrlDecode(userName); 
             return new RedirectResult(GenerateAuthorizeUrl());
         }
 

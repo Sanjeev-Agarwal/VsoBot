@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace BotInterfaceApi.Helpers
 {
@@ -8,12 +9,28 @@ namespace BotInterfaceApi.Helpers
     public class RegexUtilities
     {
         bool invalid = false;
+        readonly string pattern = @"\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*";
+        public string GetValidEmailId(string strIn)
+        {
+            if (String.IsNullOrEmpty(strIn))
+                return string.Empty;
 
+            strIn = strIn.Replace(" ", string.Empty);
+            strIn = strIn.Replace("mailto:", string.Empty);
+
+            Regex emailRegex = new Regex(pattern, RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            MatchCollection emailMatches = emailRegex.Matches(strIn);
+            return emailMatches[0].Value;
+        }
+    
         public bool IsValidEmail(string strIn)
         {
             invalid = false;
             if (String.IsNullOrEmpty(strIn))
                 return false;
+
+            strIn = strIn.Replace(" ", string.Empty);
+            strIn = strIn.Replace("mailto:", string.Empty);
 
             // Use IdnMapping class to convert Unicode domain names.
             try
@@ -32,10 +49,7 @@ namespace BotInterfaceApi.Helpers
             // Return true if strIn is in valid e-mail format.
             try
             {
-                return Regex.IsMatch(strIn,
-                      @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
-                      @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$",
-                      RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+                return Regex.IsMatch(strIn,pattern, RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
             }
             catch (RegexMatchTimeoutException)
             {

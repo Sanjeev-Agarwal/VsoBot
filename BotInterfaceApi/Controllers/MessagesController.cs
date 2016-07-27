@@ -7,6 +7,8 @@ using System.Web.Http;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using System.Web.Mvc;
+using System.Web;
+
 namespace BotInterfaceApi
 {
     [BotAuthentication]
@@ -25,7 +27,7 @@ namespace BotInterfaceApi
                 string entityString;
                 if (token)
                 {
-                    entityString = "[This is your first time. Please grant permission to communicate with VSTS by clicking the link.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken?userName=" + activity.Text + ")";
+                    entityString = "[This is your first time. Please grant permission to communicate with VSTS by clicking the link.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken?userName=" + GetValidEncodedEmail(activity.Text) + ")";
                 }
                 else if (!token && activity.Text.ToLower().Contains("hi"))
                 {
@@ -102,6 +104,13 @@ namespace BotInterfaceApi
                 return true;
             }
             return false;
+        }
+
+        private string GetValidEncodedEmail(string query)
+        {
+            var helper = new Helpers.RegexUtilities();
+            var email = helper.GetValidEmailId(query);
+            return HttpUtility.UrlEncode(email);
         }
         private Activity HandleSystemMessage(Activity message)
         {

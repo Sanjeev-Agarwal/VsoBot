@@ -2,12 +2,16 @@
 @{
     ViewBag.Title = "Token Information";
 }
-
-<h2>Token Information</h2>
-
-<p><strong>Access Token: </strong>@ViewBag.Token.accessToken</p>
-<p><strong>Token Type: </strong>@ViewBag.Token.tokenType</p>
-<p><strong>Expires In: </strong>@ViewBag.Token.expiresIn</p>
-<p><strong>Refresh Token: </strong>@ViewBag.Token.refreshToken</p>
-<p>@ViewBag.Token.Error</p>
+@if(string.IsNullOrEmpty(ViewBag.Token.Error))
+{
+<h2>Please close this window.</h2>
+<h2>Successfully retrieve the token: This token is valid only for an hour</h2>
+}
+else
+{
+    <p>@ViewBag.Token.Error</p>
+}
+<script language="">
+    window.close();
+</script>
 
