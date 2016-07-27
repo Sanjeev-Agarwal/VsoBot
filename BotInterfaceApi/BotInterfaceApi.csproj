@@ -188,10 +188,12 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Controllers\OAuthController.cs" />
+    <Compile Include="Controllers\VstsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="JSON.cs" />
+    <Compile Include="Models\ItemType.cs" />
     <Compile Include="Models\Regex.cs" />
     <Compile Include="Models\WorkItems.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

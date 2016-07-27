@@ -8,6 +8,9 @@ using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using System.Web.Mvc;
 using System.Web;
+using System.IO;
+using BotInterfaceApi.Models.TFS;
+using System.Text;
 
 namespace BotInterfaceApi
 {
@@ -41,7 +44,7 @@ namespace BotInterfaceApi
                         switch (StLUIS.intents[0].intent.ToLower())
                         {
                             case "show":
-                                entityString = GetWorkItems(StLUIS.entities[0].type); //Call VSTS API
+                                entityString = await GetWorkitems(StLUIS.entities[0].type); //Call VSTS API
                                 break;
                             default:
                                 entityString = "Sorry, I am not getting you...";
@@ -83,19 +86,25 @@ namespace BotInterfaceApi
             return Data;
         }
 
-        private string GetWorkItems(string type)
+        
+
+        private async Task<string> GetWorkitems(string type)
         {
-            var data = string.Empty;
-            if (type.Equals("task"))
+            using (HttpClient client = new HttpClient())
             {
-                return new Models.TFS.Helper().Tasks;
+                string RequestURI = "https://botinterfaceapi.azurewebsites.net/api/items/" + type;
+                HttpResponseMessage msg = await client.GetAsync(RequestURI);
+                if (msg.IsSuccessStatusCode)
+                {
+                    var JsonDataResponse = await msg.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<string>(JsonDataResponse);
+                }
             }
-            else if(type.Equals("bug"))
-            {
-                return new Models.TFS.Helper().Bugs;
-            } 
-            return "Something went wrong while looking into VSTS.";
-        } 
+
+            return "No " + type + " exist. or Some issue with parsing data";
+        }
+
+        
         private bool IsValidUser(string query)
         {
             var helper = new Helpers.RegexUtilities();
@@ -147,8 +156,5 @@ namespace BotInterfaceApi
         Task,
         Bug
     }
-    public class VstsController : ApiController
-    {
-        
-    }
+ 
 }

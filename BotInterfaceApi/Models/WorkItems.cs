@@ -1,28 +1,20 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
 namespace BotInterfaceApi.Models.TFS
 {
-    public class Helper
+    public class Data
     {
-        public string Tasks {
-            get {
-
-                return "* Task id: 682005 *Define workflow to read from blob and send to topic*, [Task url:](https://microsoftit.visualstudio.com/OneITVSO/Mktg-MKS-BP-Marketing%20Budget%20Planning/_workItems?_a=edit&id=682005) * Task id: 554422 *Context improvement in Foreach*, [Task url:](https://microsoftit.visualstudio.com/OneITVSO/Mktg-MKS-BP-Marketing%20Budget%20Planning/_workItems?_a=edit&id=554422)";
-            }
-        }
-
-        public string Bugs
-        {
-            get
-            {
-
-                return "* Bug id: 908471 *Max Concurrent Call Issue for Certain - ME web jobs*, [Bug url:](https://microsoftit.visualstudio.com/OneITVSO/Mktg-MKS-BP-Marketing%20Budget%20Planning/_workItems?_a=edit&id=908471) * Bug id: 961626 *Correct scripting scripting library not referred in HttpTrigger web api *, [Bug url:](https://microsoftit.visualstudio.com/OneITVSO/Mktg-MKS-BP-Marketing%20Budget%20Planning/_workItems?_a=edit&id=961626)";
-            }
-        }
+        public string Id { get; set; }
+        public string type { get; set; }
+        public string title { get; set; }
+        public string state { get; set; }
     }
+
+
     public class Rootobject
     {
         public string queryType { get; set; }
