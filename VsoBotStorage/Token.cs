@@ -2,6 +2,7 @@
 using Microsoft.WindowsAzure.Storage; // Namespace for CloudStorageAccount
 using Microsoft.WindowsAzure.Storage.Blob; // Namespace for Blob storage types
 using Newtonsoft.Json;
+using System;
 using System.Threading.Tasks;
 
 namespace VsoBotStorage
@@ -13,7 +14,7 @@ namespace VsoBotStorage
         {
             // Retrieve storage account from connection string.
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(
-                CloudConfigurationManager.GetSetting("StorageConnectionString"));
+                Environment.GetEnvironmentVariable("StorageConnectionString"));
 
             // Create the blob client.
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();

@@ -114,7 +114,7 @@ namespace BotInterfaceApi.Controllers
             UriBuilder uriBuilder = new UriBuilder(ConfigurationManager.AppSettings["AuthUrl"]);
             var queryParams = HttpUtility.ParseQueryString(uriBuilder.Query ?? String.Empty);
 
-            queryParams["client_id"] = ConfigurationManager.AppSettings["AppId"];
+            queryParams["client_id"] = Environment.GetEnvironmentVariable("AppId");
             queryParams["response_type"] = "Assertion";
             queryParams["state"] = "state";
             queryParams["scope"] = ConfigurationManager.AppSettings["Scope"];
@@ -128,7 +128,7 @@ namespace BotInterfaceApi.Controllers
         public string GenerateRequestPostData(string code)
         {
             return string.Format("client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer&client_assertion={0}&grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion={1}&redirect_uri={2}",
-                HttpUtility.UrlEncode(ConfigurationManager.AppSettings["AppSecret"]),
+                HttpUtility.UrlEncode(Environment.GetEnvironmentVariable("AppSecret")),
                 HttpUtility.UrlEncode(code),
                 ConfigurationManager.AppSettings["CallbackUrl"]
                 );
@@ -137,7 +137,7 @@ namespace BotInterfaceApi.Controllers
         public string GenerateRefreshPostData(string refreshToken)
         {
             return string.Format("client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer&client_assertion={0}&grant_type=refresh_token&assertion={1}&redirect_uri={2}",
-                HttpUtility.UrlEncode(ConfigurationManager.AppSettings["AppSecret"]),
+                HttpUtility.UrlEncode(Environment.GetEnvironmentVariable("AppSecret")),
                 HttpUtility.UrlEncode(refreshToken),
                 ConfigurationManager.AppSettings["CallbackUrl"]
                 );
