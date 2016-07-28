@@ -26,14 +26,14 @@ namespace VsoBotStorage
             container.CreateIfNotExists();
 
         }
-        public async Task<BotInterfaceApi.Models.TokenModel> GetToken(string userName)
+        public BotInterfaceApi.Models.TokenModel GetToken(string userName)
         {
             CloudBlockBlob blockBlob = container.GetBlockBlobReference(userName + ".json");
             if (!blockBlob.Exists()) return null;
             blockBlob.Properties.ContentType = "application/json";
-            var tokenModel = await blockBlob.DownloadTextAsync();
+            var tokenModel = blockBlob.DownloadText();
 
-            if (string.IsNullOrEmpty(tokenModel))
+            if (!string.IsNullOrEmpty(tokenModel))
             {
                 return JsonConvert.DeserializeObject<BotInterfaceApi.Models.TokenModel>(tokenModel);
             }

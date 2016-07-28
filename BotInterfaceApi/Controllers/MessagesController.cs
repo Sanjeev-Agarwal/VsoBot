@@ -26,15 +26,21 @@ namespace BotInterfaceApi
             ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
             if (activity.Type == ActivityTypes.Message)
             {
+                StateClient stateClient = activity.GetStateClient();
+                BotData userData = await stateClient.BotState.GetUserDataAsync(activity.ChannelId, activity.From.Id);
+
                 var token = IsValidUser(activity.Text);
                 string entityString;
+                string name = string.Empty;
                 if (token)
                 {
-                    entityString = "[This is your first time. Please grant permission to communicate with VSTS by clicking the link.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken?userName=" + GetValidEncodedEmail(activity.Text) + ")";
+                    name = GetValidEncodedEmail(activity.Text);
+                    entityString = "[This is your first time. Please grant permission to communicate with VSTS by clicking the link.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken?userName=" + name + ")";
+
                 }
                 else if (!token && activity.Text.ToLower().Contains("hi"))
                 {
-                    entityString = "Please share your work email Id to validate your data.";// [please login first.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken)";
+                    entityString = "Please share your work email Id to validate your data.";
                 }
                 else
                 {
@@ -44,20 +50,26 @@ namespace BotInterfaceApi
                         switch (StLUIS.intents[0].intent.ToLower())
                         {
                             case "show":
-                                entityString = await GetWorkitems(StLUIS.entities[0].type); //Call VSTS API
+                                entityString = await GetWorkitems(StLUIS.entities[0].type, activity); //Call VSTS API
                                 break;
                             default:
-                                entityString = "Sorry, I am not getting you...";
+                                entityString = " Sorry, I am not getting you ...";
                                 break;
                         }
                     }
 
                     else
                     {
-                        entityString = "Sorry, I am not getting you...";
+                        entityString = " Sorry, I am not getting you ...";
                     }
                 }
                 Activity reply = activity.CreateReply(entityString);
+                if (!string.IsNullOrEmpty(name))
+                {
+                    name = HttpUtility.UrlDecode(name);
+                    userData.SetProperty<string>("userName", name);
+                    await stateClient.BotState.SetUserDataAsync(activity.ChannelId, activity.From.Id, userData);
+                }
                 activity.TextFormat = "markdown";
                 await connector.Conversations.ReplyToActivityAsync(reply);
             }
@@ -88,20 +100,25 @@ namespace BotInterfaceApi
 
         
 
-        private async Task<string> GetWorkitems(string type)
+        private async Task<string> GetWorkitems(string type, Activity activity)
         {
-            using (HttpClient client = new HttpClient())
+            StateClient stateClient = activity.GetStateClient();
+            BotData userData = await stateClient.BotState.GetUserDataAsync(activity.ChannelId, activity.From.Id);
+            string RequestURI = string.Empty;
+            if (!string.IsNullOrEmpty(userData.GetProperty<string>("userName")))
             {
-                string RequestURI = "https://botinterfaceapi.azurewebsites.net/api/items/" + type;
-                HttpResponseMessage msg = await client.GetAsync(RequestURI);
-                if (msg.IsSuccessStatusCode)
+                using (HttpClient client = new HttpClient())
                 {
-                    var JsonDataResponse = await msg.Content.ReadAsStringAsync();
-                    return JsonConvert.DeserializeObject<string>(JsonDataResponse);
+                    RequestURI = "https://botinterfaceapi.azurewebsites.net/api/items/" + type + "$" + userData.GetProperty<string>("userName") + "/";
+                    HttpResponseMessage msg = await client.GetAsync(RequestURI);
+                    if (msg.IsSuccessStatusCode)
+                    {
+                        var JsonDataResponse = await msg.Content.ReadAsStringAsync();
+                        return JsonConvert.DeserializeObject<string>(JsonDataResponse);
+                    }
                 }
             }
-
-            return "No " + type + " exist. or Some issue with parsing data";
+            return "No " + type + " exist. or Some issue with parsing data ";
         }
 
         
