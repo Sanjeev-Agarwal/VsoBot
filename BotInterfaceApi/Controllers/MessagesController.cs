@@ -35,7 +35,7 @@ namespace BotInterfaceApi
                 if (token)
                 {
                     name = GetValidEncodedEmail(activity.Text);
-                    entityString = "[This is your first time. Please grant permission to communicate with VSTS by clicking the link.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken?userName=" + name + ")";
+                    entityString = "[This is your first time. Please grant permission to communicate with VSTS by clicking the link.](https://botinterfaceapi.azurewebsites.net/oauth/requesttoken?userName=" + name + "). After login type your query like 'Show my task' or 'Display my task' to get result.";
 
                 }
                 else if (!token && activity.Text.ToLower().Contains("hi"))
